@@ -1,0 +1,49 @@
+# application.yml — config del proyecto (YAML: jerarquía por INDENTACIÓN de 2 espacios, nunca tabs).
+# Bloques: persistencia H2 en ARCHIVO (los datos sobreviven al reinicio) y JWT (secret + expiración).
+server:
+  port: 8080                 # el puerto donde escucha Tomcat
+
+spring:
+  application:
+    name: taskflow-api
+  main:
+    banner-mode: "off"       # sin el banner ASCII de Spring al arrancar (log más limpio)
+
+  # ---- Virtual threads (Java 21 / Loom) ----
+  # Con UNA línea, el pool de Tomcat deja de atarse a threads del SO (1 request = 1 virtual thread
+  # barato). Resuelve "muchos requests que solo esperan I/O" SIN reescribir
+  # a WebFlux — el código imperativo queda INTACTO. NO resuelve backpressure/streaming (eso sigue siendo
+  # territorio reactivo). Se deja COMENTADO a propósito: v3.0 corre sin él; para probarlo, descomenta
+  # las tres líneas de abajo.
+  # threads:
+  #   virtual:
+  #     enabled: true
+
+  # ---- Persistencia ----
+  datasource:
+    # H2 en ARCHIVO: la BD es el archivo ./data/taskflow.mv.db (ruta relativa al working directory).
+    # La consola H2 usa ESTA URL, letra por letra (con otra, abre una BD vacía distinta).
+    url: jdbc:h2:file:./data/taskflow
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update       # dev local: ajusta el esquema sin borrar datos. Si cambias una entidad
+                             # (p. ej. User gana password_hash) -> borra data/*.mv.db y deja resembrar.
+    show-sql: true           # el SQL generado se LEE, no se ignora
+    open-in-view: false      # la sesión JPA NO vive durante todo el request -> DTOs siempre.
+  h2:
+    console:
+      enabled: true          # consola web SQL en /h2-console (útil para ver la columna password_hash)
+      path: /h2-console
+
+# ---- Seguridad JWT ----
+# El JwtService lee estas dos claves.
+jwt:
+  # Secret de 64 chars (>= 256 bits): HS256 lo exige o lanza WeakKeyException.
+  # EN PRODUCCIÓN esto NUNCA se commitea: va en una VARIABLE DE ENTORNO (12-factor; así lo hace el
+  # perfil docker con JWT_SECRET). Aquí en claro, a propósito, para que el arranque local no pida nada.
+  secret: "cambiame-en-produccion-taskflow-jwt-secret-de-64-caracteres-min!"
+  # Vigencia del token en milisegundos: 3600000 = 1 hora. (Para ver un ExpiredJwtException a propósito,
+  # bájalo a 60000 = 60 s.)
+  expiration-ms: 3600000
