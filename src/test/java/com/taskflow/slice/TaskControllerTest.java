@@ -121,6 +121,23 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$[0].status").value("IN_PROGRESS"));
     }
 
+    @Test
+    void getUnassigned_retorna200YJsonConAssigneeNull() throws Exception {
+        try {
+            Task t1 = new Task(4L, "Escribir tests MockMvc", "desc", TaskStatus.TODO, Priority.MED, 1L, null, java.time.LocalDate.now().plusDays(7));
+            Task t2 = new Task(6L, "Publicar en la tienda", "desc", TaskStatus.TODO, Priority.MED, 1L, null, java.time.LocalDate.now().plusDays(10));
+            when(taskService.sinResponsable()).thenReturn(List.of(t1, t2));
+
+            mockMvc.perform(get("/tasks/unassigned"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].id").value(4))
+                    .andExpect(jsonPath("$[0].assigneeId").value(org.hamcrest.Matchers.nullValue()));
+        } catch (TaskValidationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ==================== Escritura (la validación y el advice SÍ viven en el slice) ====================
 
     @Test

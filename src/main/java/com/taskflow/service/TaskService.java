@@ -124,6 +124,17 @@ public class TaskService {
     }
 
     /**
+     * Lista las tareas sin responsable: usa el predicado nombrado ReportService.SIN_ASIGNAR
+     * y ordena con la estrategia POR_FECHA (nulls al final) reusando TaskOrders.POR_FECHA.
+     */
+    public List<Task> sinResponsable() {
+        return repository.findAll().stream()
+                .filter(ReportService.SIN_ASIGNAR)
+                .sorted(TaskOrders.POR_FECHA)
+                .toList();
+    }
+
+    /**
      * Lista las tareas vencidas de TODOS los proyectos: usa la regla de la entidad Task.estaVencida()
      * y ordena por fecha ascendente reusando la estrategia POR_FECHA.
      */
