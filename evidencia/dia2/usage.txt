@@ -1,0 +1,4 @@
+54 / 1,500 AIC
+--- al empezar el dia (MP-2) ---
+Plan       ■■■■■■■■■■■■■■■■■■■■ 1% used
+           20 / 1,500 AIC

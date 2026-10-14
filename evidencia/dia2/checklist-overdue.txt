@@ -1,0 +1,32 @@
+ specs/overdue.md                                   | 42 ++++++++++++++++++++++
+ .../com/taskflow/controller/TaskController.java    | 11 +++++-
+ .../java/com/taskflow/service/TaskService.java     | 11 ++++++
+ .../com/taskflow/slice/TaskControllerTest.java     | 13 +++++++
+ .../java/com/taskflow/unit/TaskServiceTest.java    | 24 +++++++++++++
+ 5 files changed, 100 insertions(+), 1 deletion(-)
+13	0	src/test/java/com/taskflow/slice/TaskControllerTest.java
+24	0	src/test/java/com/taskflow/unit/TaskServiceTest.java
+
++    /** GET /tasks/overdue ÔÇö lista tareas vencidas seg├║n Task.estaVencida(), ordenadas por fecha asc. */
++    /**
++     * Lista las tareas vencidas de TODOS los proyectos: usa la regla de la entidad Task.estaVencida()
++     * y ordena por fecha ascendente reusando la estrategia POR_FECHA.
++     */
+
+MUTANTE: quitado .sorted(TaskOrders.POR_FECHA) de vencidas()
+
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+RESTAURADO: TaskService.java quedó exactamente como estaba.
+
+
++    /** GET /tasks/overdue ÔÇö lista tareas vencidas seg├║n Task.estaVencida(), ordenadas por fecha asc. */
++     * Lista las tareas vencidas de TODOS los proyectos: usa la regla de la entidad Task.estaVencida()
++     * y ordena por fecha ascendente reusando la estrategia POR_FECHA.
++                .filter(Task::estaVencida)
++                .sorted(TaskOrders.POR_FECHA)
+
+
+[INFO] Tests run: 69, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
