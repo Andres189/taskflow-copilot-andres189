@@ -108,6 +108,19 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value(404));
     }
 
+    @Test
+    void getOverdue_retorna200YListaEnOrden() throws Exception {
+        when(taskService.vencidas()).thenReturn(java.util.List.of(
+                tareaCon(7L, "Corregir bug de fechas", TaskStatus.IN_PROGRESS, 1L)
+        ));
+
+        mockMvc.perform(get("/tasks/overdue"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(7))
+                .andExpect(jsonPath("$[0].status").value("IN_PROGRESS"));
+    }
+
     // ==================== Escritura (la validación y el advice SÍ viven en el slice) ====================
 
     @Test
