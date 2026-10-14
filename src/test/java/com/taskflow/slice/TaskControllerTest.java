@@ -108,6 +108,41 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value(404));
     }
 
+    @Test
+    void getOverdue_retorna200YListaEnOrden() throws Exception {
+        when(taskService.vencidas()).thenReturn(java.util.List.of(
+                tareaCon(7L, "Corregir bug de fechas", TaskStatus.IN_PROGRESS, 1L,
+                        java.time.LocalDate.now().minusDays(2)),
+                tareaCon(9L, "Revisar informe", TaskStatus.TODO, 1L,
+                        java.time.LocalDate.now().minusDays(1))
+        ));
+
+        mockMvc.perform(get("/tasks/overdue"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(7))
+                .andExpect(jsonPath("$[0].dueDate").value(java.time.LocalDate.now().minusDays(2).toString()))
+                .andExpect(jsonPath("$[1].id").value(9))
+                .andExpect(jsonPath("$[1].dueDate").value(java.time.LocalDate.now().minusDays(1).toString()));
+    }
+
+    @Test
+    void getUnassigned_retorna200YJsonConAssigneeNull() throws Exception {
+        try {
+            Task t1 = new Task(4L, "Escribir tests MockMvc", "desc", TaskStatus.TODO, Priority.MED, 1L, null, java.time.LocalDate.now().plusDays(7));
+            Task t2 = new Task(6L, "Publicar en la tienda", "desc", TaskStatus.TODO, Priority.MED, 1L, null, java.time.LocalDate.now().plusDays(10));
+            when(taskService.sinResponsable()).thenReturn(List.of(t1, t2));
+
+            mockMvc.perform(get("/tasks/unassigned"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].id").value(4))
+                    .andExpect(jsonPath("$[0].assigneeId").value(org.hamcrest.Matchers.nullValue()));
+        } catch (TaskValidationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ==================== Escritura (la validación y el advice SÍ viven en el slice) ====================
 
     @Test
@@ -184,8 +219,12 @@ class TaskControllerTest {
     }
 
     private Task tareaCon(Long id, String title, TaskStatus status, Long projectId) {
+        return tareaCon(id, title, status, projectId, null);
+    }
+
+    private Task tareaCon(Long id, String title, TaskStatus status, Long projectId, java.time.LocalDate dueDate) {
         try {
-            return new Task(id, title, "desc", status, Priority.MED, projectId, 1L, null);
+            return new Task(id, title, "desc", status, Priority.MED, projectId, 1L, dueDate);
         } catch (TaskValidationException e) {
             throw new IllegalStateException("dato de prueba inválido", e);
         }

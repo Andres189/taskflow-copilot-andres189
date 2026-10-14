@@ -131,6 +131,64 @@ class TaskServiceTest {
     }
 
     @Nested
+    @DisplayName("vencidas")
+    class Vencidas {
+
+        @Test
+        void vencidas_devuelveSoloVencidasYOrdenadas() {
+            try {
+                Task t1 = new Task(1L, "Tarea A", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(2));
+                Task t2 = new Task(2L, "Tarea B", "d", TaskStatus.DONE, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(3));
+                Task t3 = new Task(3L, "Tarea C", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(1));
+                Task t4 = new Task(4L, "Tarea D", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, null);
+                when(repository.findAll()).thenReturn(java.util.List.of(t1, t2, t3, t4));
+
+                java.util.List<Task> result = service.vencidas();
+
+                org.junit.jupiter.api.Assertions.assertEquals(2, result.size());
+                org.junit.jupiter.api.Assertions.assertEquals(1L, result.get(0).getId());
+                org.junit.jupiter.api.Assertions.assertEquals(3L, result.get(1).getId());
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("SinResponsable")
+    class SinResponsable {
+
+        @Test
+        void sinResponsable_devuelveSoloSinResponsableEnOrden() {
+            try {
+                Task t10 = new Task(10L, "T-10d", "d", TaskStatus.TODO, Priority.MED, PROYECTO, null, java.time.LocalDate.now().plusDays(10));
+                Task withAssignee = new Task(11L, "T-con", "d", TaskStatus.TODO, Priority.MED, PROYECTO, 5L, java.time.LocalDate.now().plusDays(5));
+                Task noDate = new Task(12L, "T-sin-fecha", "d", TaskStatus.TODO, Priority.MED, PROYECTO, null, null);
+                Task t2 = new Task(13L, "T-2d", "d", TaskStatus.TODO, Priority.MED, PROYECTO, null, java.time.LocalDate.now().plusDays(2));
+                when(repository.findAll()).thenReturn(java.util.List.of(t10, withAssignee, noDate, t2));
+
+                java.util.List<Task> result = service.sinResponsable();
+
+                java.util.List<Long> ids = result.stream().map(Task::getId).toList();
+                assertEquals(java.util.List.of(13L, 10L, 12L), ids);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Test
+        void sinResponsable_listaVaciaCuandoNoHay() {
+            when(repository.findAll()).thenReturn(java.util.List.of(
+                    tarea(1L, "Con responsable A", 5L),
+                    tarea(2L, "Con responsable B", 6L)
+            ));
+
+            java.util.List<Task> result = service.sinResponsable();
+            assertEquals(0, result.size());
+        }
+    }
+
+    @Nested
     @DisplayName("eliminar")
     class Eliminar {
 
