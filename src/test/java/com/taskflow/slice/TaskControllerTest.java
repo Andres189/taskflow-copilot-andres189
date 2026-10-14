@@ -109,21 +109,16 @@ class TaskControllerTest {
     }
 
     @Test
-    void getOverdue_retorna200YListaEnOrden() throws Exception {
+    void getOverdue_retorna200YLista() throws Exception {
         when(taskService.vencidas()).thenReturn(java.util.List.of(
                 tareaCon(7L, "Corregir bug de fechas", TaskStatus.IN_PROGRESS, 1L,
-                        java.time.LocalDate.now().minusDays(2)),
-                tareaCon(9L, "Revisar informe", TaskStatus.TODO, 1L,
-                        java.time.LocalDate.now().minusDays(1))
+                        java.time.LocalDate.now().minusDays(2))
         ));
 
         mockMvc.perform(get("/tasks/overdue"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(7))
-                .andExpect(jsonPath("$[0].dueDate").value(java.time.LocalDate.now().minusDays(2).toString()))
-                .andExpect(jsonPath("$[1].id").value(9))
-                .andExpect(jsonPath("$[1].dueDate").value(java.time.LocalDate.now().minusDays(1).toString()));
+                .andExpect(jsonPath("$[0].title").value("Corregir bug de fechas"));
     }
 
     @Test

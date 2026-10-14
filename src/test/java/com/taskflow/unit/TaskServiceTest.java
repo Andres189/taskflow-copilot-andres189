@@ -137,17 +137,25 @@ class TaskServiceTest {
         @Test
         void vencidas_devuelveSoloVencidasYOrdenadas() {
             try {
-                Task t1 = new Task(1L, "Tarea A", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(2));
-                Task t2 = new Task(2L, "Tarea B", "d", TaskStatus.DONE, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(3));
-                Task t3 = new Task(3L, "Tarea C", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(1));
-                Task t4 = new Task(4L, "Tarea D", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, null);
-                when(repository.findAll()).thenReturn(java.util.List.of(t1, t2, t3, t4));
+                // El repositorio devuelve, en este orden:
+                // 1) una vencida hace 1 día
+                // 2) una con fecha en 3 días
+                // 3) una DONE vencida hace 10 días
+                // 4) una sin dueDate
+                // 5) una vencida hace 5 días
+                Task t1 = new Task(1L, "VenceHace1Dia", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(1));
+                Task t2 = new Task(2L, "En3Dias", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().plusDays(3));
+                Task t3 = new Task(3L, "DoneVencidaHace10Dias", "d", TaskStatus.DONE, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(10));
+                Task t4 = new Task(4L, "SinFecha", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, null);
+                Task t5 = new Task(5L, "VenceHace5Dias", "d", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, java.time.LocalDate.now().minusDays(5));
+                when(repository.findAll()).thenReturn(java.util.List.of(t1, t2, t3, t4, t5));
 
                 java.util.List<Task> result = service.vencidas();
 
+                // Solo las dos vencidas no-DONE: la de hace 5 días y la de hace 1 día; primero la de hace 5 días
                 org.junit.jupiter.api.Assertions.assertEquals(2, result.size());
-                org.junit.jupiter.api.Assertions.assertEquals(1L, result.get(0).getId());
-                org.junit.jupiter.api.Assertions.assertEquals(3L, result.get(1).getId());
+                org.junit.jupiter.api.Assertions.assertEquals(5L, result.get(0).getId());
+                org.junit.jupiter.api.Assertions.assertEquals(1L, result.get(1).getId());
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
