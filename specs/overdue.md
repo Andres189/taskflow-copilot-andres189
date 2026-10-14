@@ -18,15 +18,14 @@ atrasó sin revisar proyecto por proyecto.
 ## Dónde
 
 - Método nuevo en `TaskService`: `public List<Task> vencidas()`.
-- Endpoint nuevo en `TaskController`: `@GetMapping("/tasks/overdue")`. Ojo: tiene que declararse de
-  forma que no lo capture `GET /tasks/{id}` (hoy `GET /tasks/overdue` responde `400` con «El
+- Endpoint nuevo en `TaskController`: `@GetMapping("/tasks/overdue")`. Spring la elige antes que `GET /tasks/{id}` sin importar el orden de declaración: no escribas comentarios sobre ese orden (hoy `GET /tasks/overdue` responde `400` con «El
   parámetro 'id' tiene un valor ilegible»).
 
 ## Tests que deben existir al terminar
 
 - Unit en `TaskServiceTest`: devuelve solo vencidas y en orden; una tarea `DONE` con fecha pasada NO
   aparece; una sin `dueDate` NO aparece.
-- Slice en `TaskControllerTest`: `GET /tasks/overdue` responde `200` y el JSON trae las tareas en orden.
+- Slice en `TaskControllerTest`: `GET /tasks/overdue` responde `200` y el JSON trae el id y el title de las tareas que devuelve el servicio (el orden se prueba en el unit).
 
 ## Resultado esperado con la semilla
 
