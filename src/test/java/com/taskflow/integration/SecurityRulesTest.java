@@ -53,7 +53,7 @@ class SecurityRulesTest {
      * es un test independiente en el reporte; añadir una ruta protegida = añadir un string, no un método.
      */
     @ParameterizedTest(name = "GET {0} sin token → 401")
-    @ValueSource(strings = {"/projects", "/tasks", "/projects/1/tasks"})
+    @ValueSource(strings = {"/projects", "/tasks", "/tasks/overdue", "/tasks/unassigned", "/projects/1/tasks"})
     void rutaProtegida_sinToken_devuelve401(String ruta) throws Exception {
         mockMvc.perform(get(ruta))
                 .andExpect(status().isUnauthorized());

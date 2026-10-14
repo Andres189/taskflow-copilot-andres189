@@ -111,14 +111,19 @@ class TaskControllerTest {
     @Test
     void getOverdue_retorna200YListaEnOrden() throws Exception {
         when(taskService.vencidas()).thenReturn(java.util.List.of(
-                tareaCon(7L, "Corregir bug de fechas", TaskStatus.IN_PROGRESS, 1L)
+                tareaCon(7L, "Corregir bug de fechas", TaskStatus.IN_PROGRESS, 1L,
+                        java.time.LocalDate.now().minusDays(2)),
+                tareaCon(9L, "Revisar informe", TaskStatus.TODO, 1L,
+                        java.time.LocalDate.now().minusDays(1))
         ));
 
         mockMvc.perform(get("/tasks/overdue"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(7))
-                .andExpect(jsonPath("$[0].status").value("IN_PROGRESS"));
+                .andExpect(jsonPath("$[0].dueDate").value(java.time.LocalDate.now().minusDays(2).toString()))
+                .andExpect(jsonPath("$[1].id").value(9))
+                .andExpect(jsonPath("$[1].dueDate").value(java.time.LocalDate.now().minusDays(1).toString()));
     }
 
     @Test
@@ -214,8 +219,12 @@ class TaskControllerTest {
     }
 
     private Task tareaCon(Long id, String title, TaskStatus status, Long projectId) {
+        return tareaCon(id, title, status, projectId, null);
+    }
+
+    private Task tareaCon(Long id, String title, TaskStatus status, Long projectId, java.time.LocalDate dueDate) {
         try {
-            return new Task(id, title, "desc", status, Priority.MED, projectId, 1L, null);
+            return new Task(id, title, "desc", status, Priority.MED, projectId, 1L, dueDate);
         } catch (TaskValidationException e) {
             throw new IllegalStateException("dato de prueba inválido", e);
         }
