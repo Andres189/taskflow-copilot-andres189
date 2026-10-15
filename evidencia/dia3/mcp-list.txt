@@ -1,0 +1,7 @@
+User servers:
+  playwright (local)
+  taskflow (local)
+
+Builtin servers:
+  github-mcp-server (http)
+
