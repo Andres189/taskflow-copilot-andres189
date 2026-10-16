@@ -57,6 +57,16 @@ public class ProjectController {
     }
 
     /** GET /projects/{id} — 200 con ProjectResponse; 404 uniforme si no existe. */
+    @Operation(summary = "Obtiene el resumen del proyecto",
+            description = "Devuelve un resumen con conteos por estado y tareas vencidas. 404 si el proyecto no existe.")
+    @GetMapping("/projects/{id}/summary")
+    public com.taskflow.dto.ProjectSummaryResponse getProjectSummary(@PathVariable("id") Long id) {
+        Project proyecto = projectService.buscarPorId(id)
+                .orElseThrow(() -> new ProjectNotFoundException(id));
+        return projectService.resumen(proyecto);
+    }
+
+    /** GET /projects/{id} — 200 con ProjectResponse; 404 uniforme si no existe. */
     @Operation(summary = "Obtiene un proyecto por id",
             description = "200 con el ProjectResponse; 404 uniforme si el id no existe.")
     @GetMapping("/projects/{id}")

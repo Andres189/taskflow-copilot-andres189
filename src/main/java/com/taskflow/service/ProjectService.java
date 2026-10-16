@@ -88,6 +88,15 @@ public class ProjectService {
     }
 
     /**
+     * Resume un proyecto: cuenta tareas por estado y cuántas están vencidas.
+     * Recibe la entidad Project ya encontrada (el controller decide 404).
+     */
+    public com.taskflow.dto.ProjectSummaryResponse resumen(Project project) {
+        List<Task> tareas = tareasDe(project.getId());
+        return com.taskflow.mapper.ProjectSummaryMapper.aResponse(project, tareas);
+    }
+
+    /**
      * Elimina un proyecto (DELETE) con CASCADA MANUAL: borra primero sus tareas (regla "no Task sin
      * Project" — y además la FK task.project_id lo EXIGE: borrar el proyecto con tareas colgando daría
      * una violación de integridad) y luego el proyecto. No existe -> 404. La regla owner/ADMIN no

@@ -1,0 +1,15 @@
+Repositorio: C:\Users\User\taskflow-copilot-andres189
+URL de la app: http://127.0.0.1:8080
+Empaquetando con Maven (mvn -q package -DskipTests), tarda unos segundos...
+App arrancando (PID 26088). Esperando a que /info responda...
+App lista en 13 s.
+[OK]    GET /tasks/overdue devuelve solo la tarea 7
+[OK]    GET /tasks/unassigned devuelve las tareas 4 y 6
+[OK]    GET /projects/1/summary
+[OK]    GET /projects/2/summary
+[OK]    GET /projects/3/summary
+[OK]    GET /projects/99/summary responde 404
+[OK]    GET /projects/1/summary sin token responde 401
+App detenida (PID 26088).
+[OK]    App apagada: el puerto 8080 ya no responde
+RESULTADO: 8/8 OK
