@@ -87,6 +87,18 @@ public class TaskService {
     }
 
     /**
+     * Reasigna solo el responsable de una tarea ya encontrada por el controller.
+     * Lanza TaskStateException si la tarea está DONE.
+     */
+    public Task reasignar(Task tarea, Long assigneeId) {
+        if (tarea.getStatus() == TaskStatus.DONE) {
+            throw new TaskStateException("No se puede reasignar una tarea terminada.");
+        }
+        tarea.setAssigneeId(assigneeId);
+        return repository.save(tarea);
+    }
+
+    /**
      * Completa una tarea (la pasa a DONE). DELEGA en cambiarStatus(id, DONE): un
      * solo camino para "cambiar de estado", que además hereda la traducción a 422.
      */
